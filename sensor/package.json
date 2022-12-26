@@ -11,5 +11,8 @@
   "scripts": {
     "lint": "eslint ./src && prettier --check ./src",
     "test": "vitest ./src"
+  },
+  "dependencies": {
+    "axios": "^1.2.1"
   }
 }
