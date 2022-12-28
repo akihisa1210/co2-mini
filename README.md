@@ -33,7 +33,7 @@ flowchart LR
 
 1. Move to `monitor` directory.
 
-1. Create `myInfluxDBVolume` directory.
+1. Create `myInfluxDBVolume` and `myGrafanaVolume` directory.
 
 1. Create `.env` file.
 
@@ -47,19 +47,40 @@ flowchart LR
    GF_SECURITY_ADMIN_PASSWORD=<Grafana admin password>
    ```
 
-1. Run `docker compose --env-file=../.env up`.
+1. Run `docker compose --env-file=../.env up -d`.
+
+1. Open `localhost:8086` (InfluxDB) via browser.
+
+1. Generate API Token for the bucket.
+
+1. Open `localhost:8080` (Grafana) via browser.
+
+1. Setup InfluxDB integration.
+
+   - Query languabe
+     - Flux
+   - HTTP
+     - URL: http://influxdb:8086
+   - Auth
+     - (None)
+   - InfluxDB Details
+     - Set the information
 
 1. Move to "sensor" directory.
 
 1. Set environment variables.
 
    ```
-   $env:INFLUXDB_BASE_URL = "http://localhost:8086"
-   $ENV:INFLUXDB_TOKEN = "<InfluxDB user token (create if you don't know it)>"
+   $ENV:INFLUXDB_BASE_URL = "http://localhost:8086"
+   $ENV:INFLUXDB_TOKEN = "<InfluxDB user token>"
    $ENV:INFLUXDB_ORG = "<InfluxDB organization>"
    $ENV:INFLUXDB_BUCKET = "<InfluxDB bucket>"
    ```
 
-1. Run `tsc ./src`
+1. Run `npx tsc ./src`
 
 1. Run `node ./dist/main.js`
+
+1. Open `localhost:8080` (Grafana) via browser.
+
+1. Check the data.

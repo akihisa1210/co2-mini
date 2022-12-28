@@ -16,6 +16,8 @@ services:
       - external
   grafana:
     image: grafana/grafana-oss:9.3.2
+    volumes:
+      - ./myGrafanaVolume:/var/lib/grafana
     ports:
       - 8080:3000
     user: "0:0"
