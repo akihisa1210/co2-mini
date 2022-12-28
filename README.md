@@ -1,6 +1,6 @@
 # co2-mini
 
-Read data from a CO2 monitor device "CO2-mini" via USB
+Read data from a CO2 monitor device "CO2-mini" via USB and monitor the data.
 
 ## Architecture
 
@@ -8,105 +8,58 @@ Read data from a CO2 monitor device "CO2-mini" via USB
 flowchart LR
     C[CO2-mini]
 
-    subgraph "Remote machine (in monitor directory)"
-        subgraph "Docker (remote)"
+    subgraph "Local machine"
+        N[Node.js program]
+        subgraph "Docker"
             G[Grafana]
             I[InfluxDB]
         end
     end
 
-    subgraph "Local machine (in sensor directory)"
-        N[Node.js program]
-        subgraph "Docker (local)"
-            T[Telegraf]
-        end
-    end
-
-    C -- Send CO2 and temperature data --> N
-    N -- Send data --> I
-    G -- Visualize --> I
+    N -- "Listen data (USB)" --> C
+    N -- "Send data (HTTP)" --> I
+    G -- "Visualize (HTTP)" --> I
 ```
 
-## Setup (Remote machine)
+## Setup
 
-Create `monitor/myInfluxDBVolume` directory.
+1. Create `external` network.
 
-Create `.env` file.
+   ```
+   docker network create external
+   ```
 
-```
-DOCKER_INFLUXDB_INIT_MODE=setup
-DOCKER_INFLUXDB_INIT_USERNAME=
-DOCKER_INFLUXDB_INIT_PASSWORD=
-DOCKER_INFLUXDB_INIT_ORG=
-DOCKER_INFLUXDB_INIT_BUCKET=
-GF_SERVER_ROOT_URL=http://localhost:8080
-GF_SECURITY_ADMIN_PASSWORD=
-```
+   TODO: This network setting is for test in local environment.
 
-Move to "monitor" directory.
+1. Move to `monitor` directory.
 
-Run `docker compose --env-file=../.env up`.
+1. Create `myInfluxDBVolume` directory.
 
-## Setup (Local machine)
+1. Create `.env` file.
 
-Create `external` network.
+   ```
+   DOCKER_INFLUXDB_INIT_MODE=setup
+   DOCKER_INFLUXDB_INIT_USERNAME=<InfluxDB admin user name>
+   DOCKER_INFLUXDB_INIT_PASSWORD=<InfluxDB admin password>
+   DOCKER_INFLUXDB_INIT_ORG=<InfluxDB initial organization>
+   DOCKER_INFLUXDB_INIT_BUCKET=<InfluxDB initial bucket>
+   GF_SERVER_ROOT_URL=http://localhost:8080
+   GF_SECURITY_ADMIN_PASSWORD=<Grafana admin password>
+   ```
 
-```
-docker network create external
-```
+1. Run `docker compose --env-file=../.env up`.
 
-TODO: This network setting is for test in local environment.
+1. Move to "sensor" directory.
 
-Create `sensor/telegraf.conf`.
+1. Set environment variables.
 
-```
-[[inputs.socket_listener]]
-    service_address = "udp://:8092"
-    data_format = "influx"
+   ```
+   $env:INFLUXDB_BASE_URL = "http://localhost:8086"
+   $ENV:INFLUXDB_TOKEN = "<InfluxDB user token (create if you don't know it)>"
+   $ENV:INFLUXDB_ORG = "<InfluxDB organization>"
+   $ENV:INFLUXDB_BUCKET = "<InfluxDB bucket>"
+   ```
 
-[[outputs.influxdb_v2]]
-    token = "${INFLUXDB_TOKEN}"
-    organization = "${INFLUXDB_ORG}"
-    bucket = "${INFLUXDB_BUCKET}"
-```
+1. Run `tsc ./src`
 
-SET "INFLUXDB_URL" environment variable. Check it with `docker network inspect external`.
-
-```
-$ENV:INFLUXDB_URL = "http://<IP_ADDR>:8086"
-```
-
-Set "INFLUXDB_TOKEN" environment variable.
-
-```
-$ENV:INFLUXDB_TOKEN = "<TOKEN>"
-```
-
-Move to "sensor" directory.
-
-Run `docker compose --env-file=../.env up`.
-
-TODO: Telagraf is not used now.
-
-Set "INFLUXDB_BASE_URL" environment variable.
-
-```
-$env:INFLUXDB_BASE_URL = "http://localhost:8086"
-
-```
-
-Set "INFLUXDB_ORG" environment variable.
-
-```
-$ENV:INFLUXDB_ORG = "<ORG>"
-```
-
-Set "INFLUXDB_BUCKET" environment variable.
-
-```
-$ENV:INFLUXDB_BUCKET = "<BUCKET>"
-```
-
-Run `tsc ./src`
-
-Run `node ./dist/main.js`
+1. Run `node ./dist/main.js`
