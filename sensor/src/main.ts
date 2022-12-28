@@ -15,6 +15,10 @@ const PID = 41042;
 
 const CO2MiniDevice = new HID.HID(VID, PID);
 
+const INFLUXDB_BASE_URL = process.env.INFLUXDB_BASE_URL;
+if (INFLUXDB_BASE_URL === undefined) {
+  throw new Error("INFLUXDB_BASE_URL is not set");
+}
 const INFLUXDB_TOKEN = process.env.INFLUXDB_TOKEN;
 if (INFLUXDB_TOKEN === undefined) {
   throw new Error("INFLUXDB_TOKEN is not set");
@@ -31,7 +35,7 @@ if (INFLUXDB_BUCKET === undefined) {
 const write = (message: string) => {
   axios
     .post(
-      `http://localhost:8086/api/v2/write?org=${INFLUXDB_ORG}&bucket=${INFLUXDB_BUCKET}`,
+      `${INFLUXDB_BASE_URL}/api/v2/write?org=${INFLUXDB_ORG}&bucket=${INFLUXDB_BUCKET}`,
       message,
       {
         headers: {
