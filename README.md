@@ -38,12 +38,10 @@ flowchart LR
 1. Create `.env` file.
 
    ```
-   DOCKER_INFLUXDB_INIT_MODE=setup
    DOCKER_INFLUXDB_INIT_USERNAME=<InfluxDB admin user name>
    DOCKER_INFLUXDB_INIT_PASSWORD=<InfluxDB admin password>
    DOCKER_INFLUXDB_INIT_ORG=<InfluxDB initial organization>
    DOCKER_INFLUXDB_INIT_BUCKET=<InfluxDB initial bucket>
-   GF_SERVER_ROOT_URL=http://localhost:8080
    GF_SECURITY_ADMIN_PASSWORD=<Grafana admin password>
    ```
 
