@@ -88,6 +88,13 @@ Run `docker compose --env-file=../.env up`.
 
 TODO: Telagraf is not used now.
 
+Set "INFLUXDB_BASE_URL" environment variable.
+
+```
+$env:INFLUXDB_BASE_URL = "http://localhost:8086"
+
+```
+
 Set "INFLUXDB_ORG" environment variable.
 
 ```
